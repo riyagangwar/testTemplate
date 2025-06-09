@@ -32,7 +32,20 @@ jobs:
         run: echo "${{toJSON(steps.create-issue.outputs.result)}}"
 
       # Add here the close-issue step
+      - uses: actions/github-script@v6
+        id: close-issue
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const result = await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{fromJSON(steps.create-issue.outputs.result).number}},
+              state: 'closed'
+            })            
+            console.log(result)
 
+            
 
   graphql-api-query-issues:
     needs: rest-api-create-and-close-issue
@@ -66,17 +79,4 @@ jobs:
 
   
   # Add here the labels query step
- - uses: actions/github-script@v6
-        id: close-issue
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const result = await github.rest.issues.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: ${{fromJSON(steps.create-issue.outputs.result).number}},
-              state: 'closed'
-            })            
-            console.log(result)
 
-            
